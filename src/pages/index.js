@@ -79,6 +79,37 @@ export default function Home() {
 						<Divider my="8" borderColor="gray.400" />
 
 						<Flex direction="column">
+							<Box
+								bg={
+									current.estabelecimento
+										.situacao_cadastral !== 'Ativa'
+										? 'red.100'
+										: 'green.100'
+								}
+								w="100%"
+								p="2"
+								mb="4"
+							>
+								<Heading fontWeight="normal" size="xs">
+									Situação Cadastral
+								</Heading>
+								<Text fontWeight="semibold">
+									{
+										current.estabelecimento
+											.situacao_cadastral
+									}
+								</Text>
+							</Box>
+
+							<Box bg="gray.100" w="100%" p="2" mb="4">
+								<Heading fontWeight="normal" size="xs">
+									Razão Social
+								</Heading>
+								<Text fontWeight="semibold">
+									{current.razao_social}
+								</Text>
+							</Box>
+
 							<Box bg="gray.100" w="100%" p="2" mb="4">
 								<Heading fontWeight="normal" size="xs">
 									Nome Fantasia
