@@ -19,9 +19,11 @@ export default function Home() {
 	const [newCnpj, setNewCnpj] = useState('')
 
 	async function searchLead(cnpj) {
+		const cnpjSanit = cnpj.trim().replace(/[^0-9]/g, '')
+
 		try {
 			const res = await fetch(
-				`https://publica.cnpj.ws/cnpj/${cnpj}`,
+				`https://publica.cnpj.ws/cnpj/${cnpjSanit}`,
 				{
 					method: 'GET',
 					headers: {
@@ -82,7 +84,7 @@ export default function Home() {
 									Nome Fantasia
 								</Heading>
 								<Text fontWeight="semibold">
-									{current.razao_social}
+									{current.estabelecimento.nome_fantasia}
 								</Text>
 							</Box>
 
