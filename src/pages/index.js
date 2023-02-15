@@ -1,124 +1,18 @@
 import { useState } from 'react'
 import Head from 'next/head'
 import {
-	useToast,
 	Container,
 	Flex,
 	Box,
 	Heading,
-	Text,
-	Divider,
 	Input,
 	Button,
-	IconButton,
 	FormControl,
 	FormLabel,
 	FormHelperText,
 } from '@chakra-ui/react'
 
-import { CopyIcon } from '@chakra-ui/icons'
-
-function Consulta({ data }) {
-	const toast = useToast()
-	function clickCopy(text, label) {
-		navigator.clipboard.writeText(text)
-		toast({
-			title: `${label} copiado!`,
-			isClosable: true,
-			duration: 1500,
-			position: 'top-right',
-		})
-	}
-
-	const { razao_social, estabelecimento: empresa } = data
-
-	const parse = [
-		{
-			label: 'Situação Cadastral',
-			value: empresa.situacao_cadastral,
-			bg:
-				empresa.situacao_cadastral !== 'Ativa'
-					? 'red.100'
-					: 'green.100',
-		},
-		{
-			label: 'Razão Social',
-			value: razao_social,
-		},
-		{
-			label: 'Nome Fantasia',
-			value: empresa.nome_fantasia,
-		},
-		{
-			label: 'Cidade - UF',
-			value: `${empresa.cidade.nome} - ${empresa.estado.sigla}`,
-		},
-		{
-			label: 'E-mail',
-			value: empresa.email,
-		},
-		{
-			label: 'Telefones',
-			value: `(${empresa.ddd1}) ${empresa.telefone1.replace(
-				/(.{4}$)/,
-				'-$1'
-			)} ${
-				data.estabelecimento.ddd2 !== null
-					? ` / (${
-							data.estabelecimento.ddd2
-					  }) ${data.estabelecimento.telefone2.replace(
-							/(.{4}$)/,
-							'-$1'
-					  )}`
-					: ''
-			}`,
-		},
-		{
-			label: 'Endereço',
-			value: `${empresa.tipo_logradouro} ${empresa.logradouro}, ${empresa.numero}, ${empresa.cidade.nome}`,
-		},
-	]
-
-	return (
-		<>
-			<Divider my="8" borderColor="gray.400" />
-
-			<Flex direction="column">
-				{parse &&
-					parse.map((item) => (
-						<Flex
-							direction="row"
-							alignItems="center"
-							bg={item.bg ? item.bg : 'gray.100'}
-							w="100%"
-							p="2"
-							mb="4"
-							borderRadius="md"
-						>
-							<Box flex="1">
-								<Heading fontWeight="normal" size="xs">
-									{item.label}
-								</Heading>
-								<Text fontWeight="semibold">
-									{item.value}
-								</Text>
-							</Box>
-							<IconButton
-								colorScheme="blue"
-								_hover={{ bg: 'blue.100' }}
-								variant="ghost"
-								ml="2"
-								icon={<CopyIcon />}
-								onClick={() =>
-									clickCopy(item.value, item.label)
-								}
-							/>
-						</Flex>
-					))}
-			</Flex>
-		</>
-	)
-}
+import ListItems from '@/components/ListItems'
 
 export default function Home() {
 	const [loading, setLoading] = useState(false)
@@ -186,7 +80,7 @@ export default function Home() {
 					</FormHelperText>
 				</FormControl>
 
-				{current && <Consulta data={current} />}
+				{current && <ListItems list={current} />}
 			</Container>
 		</>
 	)
