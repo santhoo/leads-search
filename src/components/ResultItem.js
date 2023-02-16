@@ -14,8 +14,10 @@ function CardResult({ error, skeleton, data }) {
 	const handleOpen = useDetailContext()
 
 	const isActive =
+		!error.error &&
+		!skeleton &&
 		handleOpen.active.estabelecimento?.cnpj ===
-		data.estabelecimento?.cnpj
+			data.estabelecimento?.cnpj
 			? true
 			: false
 	const isEnabled = !error.error && !isActive ? true : false
