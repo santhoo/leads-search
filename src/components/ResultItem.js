@@ -20,7 +20,8 @@ function CardResult({ error, skeleton, data }) {
 			data.estabelecimento?.cnpj
 			? true
 			: false
-	const isEnabled = !error.error && !isActive ? true : false
+	const isEnabled =
+		!error.error && !skeleton && !isActive ? true : false
 
 	return (
 		<Flex
