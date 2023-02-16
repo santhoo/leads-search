@@ -11,7 +11,9 @@ import {
 	FormLabel,
 	FormHelperText,
 	Text,
+	Tooltip,
 } from '@chakra-ui/react'
+import { Search2Icon } from '@chakra-ui/icons'
 
 import { useDetailContext } from '@/context/DetailProvider'
 import ListResults from '@/components/ListResults'
@@ -144,9 +146,31 @@ export default function Bulk() {
 								handleTextList(e.target.value)
 							}
 						/>
-						<FormHelperText as={Flex} fontWeight="semibold">
-							<Text mr="1">Linhas: {textList.length}</Text>
-							<Text>| CNPJs: {searchList.length}</Text>
+						<FormHelperText
+							as={Flex}
+							fontWeight="semibold"
+							color="gray.500"
+						>
+							<Text>Linhas: {textList.length} |</Text>
+
+							<Tooltip
+								label={`${
+									textList.length - searchList.length
+								} linhas não são CNPJ válidos`}
+								isDisabled={
+									textList.length === searchList.length
+								}
+							>
+								<Text
+									ml="1"
+									color={
+										textList.length !== searchList.length &&
+										'red.500'
+									}
+								>
+									CNPJs: {searchList.length}
+								</Text>
+							</Tooltip>
 						</FormHelperText>
 						<Button
 							mr="0"
@@ -160,7 +184,10 @@ export default function Bulk() {
 						</Button>
 					</FormControl>
 
-					<ListResults list={resultList} />
+					<ListResults
+						loading={loading}
+						list={resultList}
+					/>
 				</Flex>
 
 				<Box
@@ -169,7 +196,7 @@ export default function Bulk() {
 					h="100%"
 					position="relative"
 				>
-					<Box
+					<Flex
 						position="absolute"
 						left="0"
 						right="0"
@@ -179,14 +206,29 @@ export default function Bulk() {
 						p="8"
 					>
 						{handleOpen.active?.empty ? (
-							// <DetailEmpty />
-							<h1>{handleOpen.active.empty}</h1>
+							<Flex
+								flex="1"
+								justifyContent="center"
+								alignItems="center"
+								alignSelf="center"
+								textAlign="center"
+								direction="column"
+							>
+								<Search2Icon
+									boxSize={12}
+									mb="6"
+									color="gray.300"
+								/>
+								<Heading size="md" color="gray.400">
+									{handleOpen.active.empty}
+								</Heading>
+							</Flex>
 						) : (
 							<Container>
 								<ItemDetail item={handleOpen.active} />
 							</Container>
 						)}
-					</Box>
+					</Flex>
 				</Box>
 			</Flex>
 		</>

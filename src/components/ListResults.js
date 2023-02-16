@@ -2,12 +2,12 @@ import { Box, Flex, Heading } from '@chakra-ui/react'
 
 import ResultItem from '@/components/ResultItem'
 
-export default function ListResults({ list }) {
+export default function ListResults({ list, loading }) {
 	return (
 		<>
 			{list?.length > 0 && (
 				<Flex
-					mt="16"
+					mt="12"
 					direction="column"
 					height="100%"
 					boxShadow="md"
@@ -27,7 +27,7 @@ export default function ListResults({ list }) {
 					</Box>
 
 					<Box
-						bg="gray.400"
+						bg="white"
 						flex="1"
 						overflow="hidden"
 						position="relative"
@@ -44,6 +44,12 @@ export default function ListResults({ list }) {
 							{list.map((item, index) => (
 								<ResultItem key={index} empresa={item} />
 							))}
+
+							{loading && (
+								<ResultItem
+									empresa={{ skeleton: loading }}
+								/>
+							)}
 						</Box>
 					</Box>
 				</Flex>
