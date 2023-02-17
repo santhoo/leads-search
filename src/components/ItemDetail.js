@@ -1,6 +1,7 @@
-import { Flex } from '@chakra-ui/react'
+import { Flex, Heading } from '@chakra-ui/react'
 
 import CardItem from '@/components/CardItem'
+import PlaceDetail from '@/components/PlaceDetail'
 
 export default function ItemDetail({ item }) {
 	// console.log('ITEM:', item)
@@ -55,10 +56,26 @@ export default function ItemDetail({ item }) {
 
 	return (
 		<Flex direction="column">
-			{parse &&
-				parse.map((item, index) => (
-					<CardItem key={index} item={item} />
-				))}
+			{parse && item?.razao_social && (
+				<>
+					<Heading
+						textTransform="uppercase"
+						size="xs"
+						mb="4"
+						py="1"
+						bg="gray.100"
+						color="gray.500"
+						textAlign="center"
+					>
+						Dados CNPJ
+					</Heading>
+					{parse.map((item, index) => (
+						<CardItem key={index} item={item} />
+					))}
+				</>
+			)}
+
+			<PlaceDetail item={item} />
 		</Flex>
 	)
 }
