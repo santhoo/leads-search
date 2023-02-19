@@ -62,6 +62,7 @@ export default function ItemDetail({ item }) {
 		'terra.com.br',
 		'yahoo.com.br',
 		'ig.com.br',
+		'uol.com.br',
 	]
 
 	const sanitDomain = [
