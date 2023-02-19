@@ -54,6 +54,41 @@ export default function ItemDetail({ item }) {
 		},
 	]
 
+	const invalidDomains = [
+		'gmail.com',
+		'outlook.com',
+		'hotmail.com',
+		'bol.com.br',
+		'terra.com.br',
+		'yahoo.com.br',
+		'ig.com.br',
+	]
+
+	const sanitDomain = [
+		'assessoria',
+		'contabilidade',
+		'contabil',
+	]
+
+	const emailDomain = empresa.email.split('@')[1]
+
+	if (!invalidDomains.includes(emailDomain)) {
+		// Se domínio de e-mail não for genérico
+
+		// const emailTeste = 'endereco@dominio.com'
+		// if (!invalidDomains.includes(emailTeste.split('@')[1])) {
+
+		const domainAlert = sanitDomain.some((w) =>
+			emailDomain.includes(w)
+		)
+
+		parse.push({
+			label: 'Possível site',
+			value: `https://www.${empresa.email.split('@')[1]}`,
+			alert: domainAlert,
+		})
+	}
+
 	return (
 		<Flex direction="column">
 			{parse && item?.razao_social && (

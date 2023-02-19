@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {
 	useToast,
 	Flex,
@@ -5,9 +6,13 @@ import {
 	Heading,
 	Text,
 	IconButton,
+	Link as TextLink,
 } from '@chakra-ui/react'
 
-import { CopyIcon } from '@chakra-ui/icons'
+import {
+	CopyIcon,
+	ExternalLinkIcon,
+} from '@chakra-ui/icons'
 
 export default function CardItem({ item }) {
 	const toast = useToast()
@@ -35,7 +40,28 @@ export default function CardItem({ item }) {
 				<Heading fontWeight="normal" size="xs">
 					{item.label}
 				</Heading>
-				<Text fontWeight="semibold">{item.value}</Text>
+				<Text fontWeight="semibold">
+					{item.value.startsWith('https://') ? (
+						<Link href={item.value} passHref legacyBehavior>
+							<TextLink
+								color={
+									item.alert ? 'yellow.600' : 'blue.500'
+								}
+								isExternal
+							>
+								{item.value}
+								<ExternalLinkIcon
+									mb="1"
+									ml="1"
+									w="4"
+									h="4"
+								/>
+							</TextLink>
+						</Link>
+					) : (
+						item.value
+					)}
+				</Text>
 			</Box>
 			<IconButton
 				colorScheme="blue"
