@@ -101,7 +101,6 @@ export default function PlaceDetail({ item: rawItem }) {
 			})
 
 			if (detailList?.length > 0) {
-				// console.log('TEM LISTA DETALHE', detailList)
 				let placesList = []
 
 				detailList.map((item) => {
@@ -116,7 +115,6 @@ export default function PlaceDetail({ item: rawItem }) {
 				})
 
 				if (placesList?.length > 0) {
-					// console.log('TEM PLACES', placesList)
 					return placesList
 				}
 			}
