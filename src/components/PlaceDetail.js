@@ -1,4 +1,4 @@
-import { CopyIcon } from '@chakra-ui/icons'
+import Link from 'next/link'
 import {
 	useToast,
 	Heading,
@@ -12,7 +12,13 @@ import {
 	Text,
 	Flex,
 	IconButton,
+	Link as TextLink,
 } from '@chakra-ui/react'
+
+import {
+	CopyIcon,
+	ExternalLinkIcon,
+} from '@chakra-ui/icons'
 
 const queryResponse = {
 	candidates: [
@@ -40,6 +46,15 @@ const idResponse = {
 	status: 'OK',
 }
 
+const labels = {
+	formatted_phone_number: 'Telefone',
+	business_status: 'Condição',
+	formatted_address: 'Endereço',
+	name: 'Nome',
+	url: 'URL no Google',
+	website: 'Site próprio',
+}
+
 export default function PlaceDetail({ item: rawItem }) {
 	function parseFindList(itemObj) {
 		const { razao_social, estabelecimento: empresa } =
@@ -47,8 +62,6 @@ export default function PlaceDetail({ item: rawItem }) {
 
 		if (Object.keys(empresa)?.length) {
 			let queryList = [
-				`${razao_social} ${empresa.cidade.nome} ${empresa.estado.nome}`,
-				`${empresa.tipo_logradouro} ${empresa.logradouro}, ${empresa.numero}, ${empresa.cidade.nome} - ${empresa.estado.nome}`,
 				`(${empresa.ddd1}) ${empresa.telefone1.replace(
 					/(.{4}$)/,
 					'-$1'
@@ -63,6 +76,8 @@ export default function PlaceDetail({ item: rawItem }) {
 							)}`,
 					  ]
 					: []),
+				`${razao_social} ${empresa.cidade.nome} ${empresa.estado.nome}`,
+				`${empresa.tipo_logradouro} ${empresa.logradouro}, ${empresa.numero}, ${empresa.cidade.nome} - ${empresa.estado.nome}`,
 			]
 
 			return queryList
@@ -162,30 +177,75 @@ export default function PlaceDetail({ item: rawItem }) {
 			{placesList?.length > 0 &&
 				placesList.map(({ query, place }, key) => (
 					<Card key={key} mb="4">
-						<Badge colorScheme="yellow" px="2" py="1">
-							{key + 1} - Resultado de local
-						</Badge>
-						<CardHeader px="2" pt="2" pb="2">
-							<Heading size="xs" color="gray.500">
+						<Badge
+							as={Flex}
+							display="flex"
+							fontWeight="normal"
+							colorScheme="yellow"
+							px="2"
+							py="1"
+							maxWidth="100%"
+							direction="row"
+							whiteSpace="normal"
+						>
+							<Text>{key + 1} - Resultados para:</Text>{' '}
+							<Text
+								display="block"
+								noOfLines="1"
+								ml="1"
+								flex="1"
+								fontWeight="bold"
+							>
 								{query}
-							</Heading>
+							</Text>
+						</Badge>
+						<CardHeader px="2" pt="2" pb="0">
+							<Heading size="xs" color="gray.500"></Heading>
 						</CardHeader>
-						<CardBody>
+						<CardBody p="2">
 							{Object.keys(place)?.length > 0 && (
 								<Stack
 									divider={<StackDivider />}
-									spacing="4"
+									spacing="3"
 								>
 									{Object.entries(place).map(
 										(prop, index) => (
 											<Box key={index}>
 												<Flex alignItems="center">
 													<Box flex="1">
-														<Badge colorScheme="linkedin">
-															{prop[0]}
-														</Badge>
-														<Text fontSize="md">
-															{prop[1]}
+														<Heading
+															fontWeight="normal"
+															size="xs"
+														>
+															{labels[prop[0]] || prop[0]}
+														</Heading>
+														<Text
+															noOfLines={1}
+															fontWeight="semibold"
+														>
+															{prop[0] === 'url' ||
+															prop[0] === 'website' ? (
+																<Link
+																	href={prop[1]}
+																	passHref
+																	legacyBehavior
+																>
+																	<TextLink
+																		color="blue.500"
+																		isExternal
+																	>
+																		{prop[1]}{' '}
+																		<ExternalLinkIcon
+																			mb="1"
+																			ml="1"
+																			w="4"
+																			h="4"
+																		/>
+																	</TextLink>
+																</Link>
+															) : (
+																prop[1]
+															)}
 														</Text>
 													</Box>
 													<IconButton
