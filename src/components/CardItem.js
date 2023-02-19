@@ -41,7 +41,7 @@ export default function CardItem({ item }) {
 					{item.label}
 				</Heading>
 				<Text fontWeight="semibold">
-					{item.value.startsWith('https://') ? (
+					{item.value?.startsWith('https://') ? (
 						<Link href={item.value} passHref legacyBehavior>
 							<TextLink
 								color={
