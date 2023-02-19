@@ -18,6 +18,7 @@ import { Search2Icon } from '@chakra-ui/icons'
 import { useDetailContext } from '@/context/DetailProvider'
 import ListResults from '@/components/ListResults'
 import ItemDetail from '@/components/ItemDetail'
+import { serchInterval } from '@/util/defaults'
 
 export default function Bulk() {
 	const [loading, setLoading] = useState(false)
@@ -37,10 +38,10 @@ export default function Bulk() {
 	function parseSearch(list) {
 		// Monta Array com linhas da Textarea
 		const valid = list.filter(function (entry) {
-			const sanit = entry.trim()
+			const sanit = entry.trim().replace(/[^0-9]/g, '')
 			if (
 				sanit !== '' && // Limpa linhas vazias
-				sanit.replace(/[^0-9]/g, '').length === 14 // Aceita apenas CNPJs
+				sanit.length === 14 // Aceita apenas CNPJs
 			) {
 				return true
 			}
@@ -49,6 +50,7 @@ export default function Bulk() {
 		setSearchList(valid)
 	}
 
+	const [lastSearchTime, setLastSearchTime] = useState('')
 	const [resultList, setResultList] = useState([])
 	async function handleFetch() {
 		if (searchList.length > 0) {
@@ -59,11 +61,19 @@ export default function Bulk() {
 
 			searchList.forEach((cnpj, i) => {
 				setTimeout(async () => {
-					const response = await fetchCnpj(cnpj)
+					const cnpjSanit = cnpj
+						.trim()
+						.replace(/[^0-9]/g, '')
+					const response = await fetchCnpj(cnpjSanit)
+
+					const timeNow = Date.now()
+					setLastSearchTime(timeNow)
+
 					setResultList((resultList) => [
 						...resultList,
 						response,
 					])
+					// console.log('RESPONSE:', cnpj, response)
 
 					// Cria log de cada consulta
 					let today = new Date()
@@ -77,9 +87,12 @@ export default function Bulk() {
 							today.getSeconds()
 					)
 
+					// Define o primeiro resultado como ativo
+					i === 0 && handleOpen.setActive(response)
+
 					// Para o Loading se for o último fetch
 					i + 1 === searchList.length && setLoading(false)
-				}, i * 40000)
+				}, i * serchInterval)
 			})
 		}
 	}
@@ -187,6 +200,8 @@ export default function Bulk() {
 					<ListResults
 						loading={loading}
 						list={resultList}
+						searchLength={searchList.length}
+						searchTime={lastSearchTime}
 					/>
 				</Flex>
 

@@ -2,7 +2,12 @@ import { Box, Flex, Heading } from '@chakra-ui/react'
 
 import ResultItem from '@/components/ResultItem'
 
-export default function ListResults({ list, loading }) {
+export default function ListResults({
+	list,
+	searchLength,
+	loading,
+	searchTime,
+}) {
 	return (
 		<>
 			{list?.length > 0 && (
@@ -22,7 +27,7 @@ export default function ListResults({ list, loading }) {
 						borderColor="blue.400"
 					>
 						<Heading fontSize="sm" fontWeight="bold">
-							{list.length} CNPJs buscados
+							{list.length} de {searchLength} CNPJs buscados
 						</Heading>
 					</Box>
 
@@ -45,9 +50,11 @@ export default function ListResults({ list, loading }) {
 								<ResultItem key={index} empresa={item} />
 							))}
 
-							{loading && (
+							{loading && searchTime && (
 								<ResultItem
-									empresa={{ skeleton: loading }}
+									empresa={{
+										skeleton: searchTime,
+									}}
 								/>
 							)}
 						</Box>

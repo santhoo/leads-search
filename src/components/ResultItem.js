@@ -1,17 +1,62 @@
+import { useState } from 'react'
 import {
-	Box,
 	Flex,
 	Heading,
 	Text,
-	IconButton,
 	SkeletonText,
+	Box,
 } from '@chakra-ui/react'
 
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import { useDetailContext } from '@/context/DetailProvider'
+import { useInterval } from '@/util/functions'
+import { serchInterval } from '@/util/defaults'
+
+function BackgroundProgress({
+	value,
+	max = 100,
+	bg = 'gray.300',
+	children,
+}) {
+	const progress = (100 * value) / max
+	const rightPost = `${100 - progress}%`
+
+	return (
+		<Box>
+			<Box
+				position="absolute"
+				left="0"
+				right="0"
+				top="0"
+				bottom="0"
+				zIndex="0"
+			>
+				<Box
+					position="absolute"
+					left="0"
+					right={rightPost}
+					top="0"
+					bottom="0"
+					bg={bg}
+				/>
+			</Box>
+			<Box zIndex="10">{children}</Box>
+		</Box>
+	)
+}
 
 function CardResult({ error, skeleton, data }) {
 	const handleOpen = useDetailContext()
+	const [lastElapsed, setLastElapsed] = useState('')
+
+	useInterval(() => {
+		if (skeleton) {
+			// console.log('data', skeleton)
+			const elapsed = Date.now() - skeleton
+
+			setLastElapsed(elapsed)
+		}
+	}, 400)
 
 	const isActive =
 		!error.error &&
@@ -46,6 +91,7 @@ function CardResult({ error, skeleton, data }) {
 			justifyContent="center"
 			borderBottom="2px"
 			borderColor="white"
+			position="relative" // bg progress
 			cursor={isEnabled && 'pointer'}
 			onClick={() => {
 				isEnabled && handleOpen.setActive(data)
@@ -59,12 +105,17 @@ function CardResult({ error, skeleton, data }) {
 					<Text fontWeight="semibold">{error.error}</Text>
 				</>
 			) : skeleton ? (
-				<SkeletonText
-					noOfLines={2}
-					spacing="2"
-					skeletonHeight="3"
-					w="50%"
-				/>
+				<BackgroundProgress
+					value={lastElapsed}
+					max={serchInterval}
+				>
+					<SkeletonText
+						noOfLines={2}
+						spacing="2"
+						skeletonHeight="3"
+						w="50%"
+					/>
+				</BackgroundProgress>
 			) : (
 				<Flex direction="row">
 					<Flex
@@ -81,7 +132,7 @@ function CardResult({ error, skeleton, data }) {
 								'Ativa' &&
 								` - ${data.estabelecimento.situacao_cadastral}`}
 						</Heading>
-						<Text fontWeight="semibold">
+						<Text fontWeight="semibold" noOfLines={1}>
 							{data.razao_social}
 						</Text>
 					</Flex>
