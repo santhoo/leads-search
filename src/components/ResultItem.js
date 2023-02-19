@@ -19,7 +19,8 @@ function BackgroundProgress({
 	children,
 }) {
 	const progress = (100 * value) / max
-	const rightPost = `${100 - progress}%`
+	const rightPost =
+		value < max ? `${100 - progress}%` : '100%'
 
 	return (
 		<Box>
