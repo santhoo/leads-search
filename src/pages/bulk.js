@@ -50,49 +50,53 @@ export default function Bulk() {
 		setSearchList(valid)
 	}
 
+	const [searchTimeout, setSearchTimeout] = useState(null)
 	const [lastSearchTime, setLastSearchTime] = useState('')
 	const [resultList, setResultList] = useState([])
 	async function handleFetch() {
 		if (searchList.length > 0) {
 			setLoading(true)
 
+			setNewSearch(false)
 			setResultList([])
 			handleOpen.reset()
 
 			searchList.forEach((cnpj, i) => {
-				setTimeout(async () => {
-					const cnpjSanit = cnpj
-						.trim()
-						.replace(/[^0-9]/g, '')
-					const response = await fetchCnpj(cnpjSanit)
+				setSearchTimeout(
+					setTimeout(async () => {
+						const cnpjSanit = cnpj
+							.trim()
+							.replace(/[^0-9]/g, '')
+						const response = await fetchCnpj(cnpjSanit)
 
-					const timeNow = Date.now()
-					setLastSearchTime(timeNow)
+						const timeNow = Date.now()
+						setLastSearchTime(timeNow)
 
-					setResultList((resultList) => [
-						...resultList,
-						response,
-					])
-					// console.log('RESPONSE:', cnpj, response)
+						setResultList((resultList) => [
+							...resultList,
+							response,
+						])
+						// console.log('RESPONSE:', cnpj, response)
 
-					// Cria log de cada consulta
-					let today = new Date()
-					console.log(
-						'Buscando:',
-						cnpj,
-						today.getHours() +
-							':' +
-							today.getMinutes() +
-							':' +
-							today.getSeconds()
-					)
+						// Cria log de cada consulta
+						let today = new Date()
+						console.log(
+							'Buscando:',
+							cnpj,
+							today.getHours() +
+								':' +
+								today.getMinutes() +
+								':' +
+								today.getSeconds()
+						)
 
-					// Define o primeiro resultado como ativo
-					i === 0 && handleOpen.setActive(response)
+						// Define o primeiro resultado como ativo
+						i === 0 && handleOpen.setActive(response)
 
-					// Para o Loading se for o último fetch
-					i + 1 === searchList.length && setLoading(false)
-				}, i * serchInterval)
+						// Para o Loading se for o último fetch
+						i + 1 === searchList.length && setLoading(false)
+					}, i * serchInterval)
+				)
 			})
 		}
 	}
@@ -128,6 +132,14 @@ export default function Bulk() {
 
 	const handleOpen = useDetailContext()
 
+	const [newSearch, setNewSearch] = useState(false)
+	function HandleNewSearch() {
+		// Para a busca que está acontecendo
+		clearTimeout(searchTimeout)
+		setLoading(false)
+		setNewSearch(true)
+	}
+
 	return (
 		<>
 			<Head>
@@ -142,60 +154,90 @@ export default function Bulk() {
 					p="8"
 					direction="column"
 				>
-					<Heading fontSize="2xl" mb="2">
-						Busca em massa de Leads
-					</Heading>
-					<FormControl as={Flex} direction="column">
-						<FormLabel>Digite um CNPJ por linha</FormLabel>
-						<Textarea
-							bg="white"
-							value={textareaValue}
-							resize="none"
-							fontSize="sm"
-							rows="5"
-							placeholder={`__.___.___/____-__\n__.___.___/____-__\n__.___.___/____-__`}
-							isDisabled={loading}
-							onChange={(e) =>
-								handleTextList(e.target.value)
-							}
-						/>
-						<FormHelperText
-							as={Flex}
-							fontWeight="semibold"
-							color="gray.500"
-						>
-							<Text>Linhas: {textList.length} |</Text>
-
-							<Tooltip
-								label={`${
-									textList.length - searchList.length
-								} linhas não são CNPJ válidos`}
-								isDisabled={
-									textList.length === searchList.length
-								}
-							>
-								<Text
-									ml="1"
-									color={
-										textList.length !== searchList.length &&
-										'red.500'
+					{(resultList.length === 0 ||
+						newSearch !== false) && (
+						<>
+							<Heading fontSize="2xl" mb="2">
+								Busca em massa de Leads
+							</Heading>
+							<FormControl as={Flex} direction="column">
+								<FormLabel>
+									Digite um CNPJ por linha
+								</FormLabel>
+								<Textarea
+									bg="white"
+									value={textareaValue}
+									resize="none"
+									fontSize="sm"
+									rows="5"
+									placeholder={`__.___.___/____-__\n__.___.___/____-__\n__.___.___/____-__`}
+									isDisabled={loading}
+									onChange={(e) =>
+										handleTextList(e.target.value)
 									}
+								/>
+								<FormHelperText
+									as={Flex}
+									fontWeight="semibold"
+									color="gray.500"
 								>
-									CNPJs: {searchList.length}
-								</Text>
-							</Tooltip>
-						</FormHelperText>
-						<Button
-							mr="0"
-							ml="auto"
-							colorScheme="blue"
-							size="sm"
-							isLoading={loading}
-							onClick={() => handleFetch()}
-						>
-							Buscar todos
-						</Button>
-					</FormControl>
+									<Text>Linhas: {textList.length} |</Text>
+
+									<Tooltip
+										label={`${
+											textList.length - searchList.length
+										} linhas não são CNPJ válidos`}
+										isDisabled={
+											textList.length === searchList.length
+										}
+									>
+										<Text
+											ml="1"
+											color={
+												textList.length !==
+													searchList.length && 'red.500'
+											}
+										>
+											CNPJs: {searchList.length}
+										</Text>
+									</Tooltip>
+								</FormHelperText>
+								<Button
+									mr="0"
+									ml="auto"
+									colorScheme="blue"
+									size="sm"
+									isLoading={loading}
+									onClick={() => handleFetch()}
+								>
+									Buscar todos
+								</Button>
+							</FormControl>
+						</>
+					)}
+
+					{newSearch === false && resultList.length > 0 && (
+						<Flex direction="row">
+							{loading && (
+								<Button
+									size="sm"
+									mr="4"
+									variant="ghost"
+									isLoading={loading}
+								>
+									Loading
+								</Button>
+							)}
+							<Button
+								flex="1"
+								colorScheme="blue"
+								size="sm"
+								onClick={() => HandleNewSearch()}
+							>
+								Nova busca
+							</Button>
+						</Flex>
+					)}
 
 					<ListResults
 						loading={loading}
