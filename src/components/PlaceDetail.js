@@ -114,7 +114,9 @@ export default function PlaceDetail({ item: rawItem }) {
 					// console.log(item.query, 'candidates', candidates)
 
 					if (candidates?.length > 0) {
-						candidates.map((candidate) => {
+						const slicedCandidate = candidates.slice(0, 3) // pega detalhes dos 3 primeiros candidatos
+
+						slicedCandidate.map((candidate) => {
 							candidatesList.push({
 								query: item.label,
 								...candidate,
