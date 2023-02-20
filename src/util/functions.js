@@ -21,7 +21,7 @@ function useInterval(callback, delay) {
 }
 
 async function fetchGet(endpoint, query) {
-	const url = process.env.NEXT_PUBLIC_VERCEL_URL
+	const url = process.env.NEXT_PUBLIC_API
 
 	const response = await fetch(
 		`${url}/${endpoint}/${query}`,
