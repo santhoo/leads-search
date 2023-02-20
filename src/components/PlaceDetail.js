@@ -111,7 +111,7 @@ export default function PlaceDetail({ item: rawItem }) {
 			await Promise.all(
 				list.map(async (item) => {
 					const candidates = await findPlaceId(item.query)
-					console.log(item.query, 'candidates', candidates)
+					// console.log(item.query, 'candidates', candidates)
 
 					if (candidates?.length > 0) {
 						candidates.map((candidate) => {
@@ -221,6 +221,7 @@ export default function PlaceDetail({ item: rawItem }) {
 			const results = await getPlaces(rawItem)
 
 			setLoading(false)
+			console.log('useEffect Results:', results)
 			setResultList(results)
 		}
 

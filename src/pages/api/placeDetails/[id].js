@@ -17,6 +17,7 @@ export default async function GetPlaceDetails(req, res) {
 		)
 
 		const data = await response.json()
+		console.log('API placeDetails:', id, data)
 
 		return res.status(200).json({ data })
 	}

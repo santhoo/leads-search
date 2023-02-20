@@ -21,7 +21,7 @@ export default async function GetPlaceId(req, res) {
 		})
 
 		const data = await response.json()
-		// console.log('API placeId:', search, data)
+		console.log('API placeId:', search, data)
 
 		return res.status(200).json({ data })
 	}

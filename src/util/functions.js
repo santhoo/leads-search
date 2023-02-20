@@ -23,19 +23,21 @@ function useInterval(callback, delay) {
 async function fetchGet(endpoint, query) {
 	const url = process.env.NEXT_PUBLIC_API
 
-	const response = await fetch(
-		`${url}/${endpoint}/${query}`,
-		{
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		}
-	)
+	try {
+		const response = await fetch(
+			`${url}/${endpoint}/${query}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+		)
 
-	const data = await response.json()
-
-	return data
+		return await response.json()
+	} catch (err) {
+		console.log(err)
+	}
 }
 
 export { useInterval, fetchGet }
