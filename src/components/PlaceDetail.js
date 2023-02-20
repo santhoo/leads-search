@@ -173,6 +173,8 @@ export default function PlaceDetail({ item: rawItem }) {
 				data.status === 'OK' &&
 				data.candidates?.length > 0
 			) {
+				console.log('findPlaceId', query, data)
+
 				return data.candidates
 			}
 		} catch (err) {
@@ -192,6 +194,8 @@ export default function PlaceDetail({ item: rawItem }) {
 				data.status === 'OK' &&
 				Object.keys(data?.result).length > 0
 			) {
+				console.log('placeDetail', placeId, data)
+
 				return data.result
 			}
 		} catch (err) {
@@ -221,7 +225,7 @@ export default function PlaceDetail({ item: rawItem }) {
 			const results = await getPlaces(rawItem)
 
 			setLoading(false)
-			console.log('useEffect Results:', results)
+			// console.log('useEffect Results:', results)
 			setResultList(results)
 		}
 
