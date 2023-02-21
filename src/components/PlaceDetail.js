@@ -89,10 +89,19 @@ export default function PlaceDetail({ item: rawItem }) {
 							},
 					  ]
 					: []),
-				{
-					label: 'Razão Social e Cidade',
-					query: `${razao_social} ${empresa.cidade.nome} ${empresa.estado.nome}`,
-				},
+				...(empresa.nome_fantasia
+					? [
+							{
+								label: 'Nome Fantasia e Cidade',
+								query: `${empresa.nome_fantasia} ${empresa.cidade.nome} ${empresa.estado.nome}`,
+							},
+					  ]
+					: [
+							{
+								label: 'Razão Social e Cidade',
+								query: `${razao_social} ${empresa.cidade.nome} ${empresa.estado.nome}`,
+							},
+					  ]),
 				{
 					label: 'Endereço e Cidade',
 					query: `${empresa.tipo_logradouro} ${empresa.logradouro}, ${empresa.numero}, ${empresa.cidade.nome} - ${empresa.estado.nome}`,
