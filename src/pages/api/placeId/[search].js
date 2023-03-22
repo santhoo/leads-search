@@ -10,8 +10,8 @@ export default async function GetPlaceId(req, res) {
 
 		const endpoint =
 			sanitizePhone.length > 8
-				? `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=%2B55${sanitizePhone}&inputtype=phonenumber&key=${placeKey}`
-				: `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${search}&inputtype=textquery&key=${placeKey}`
+				? `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=%2B55${sanitizePhone}&inputtype=phonenumber&fields=place_id,name,business_status&key=${placeKey}`
+				: `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${search}&inputtype=textquery&fields=place_id,name,business_status&key=${placeKey}`
 
 		const response = await fetch(endpoint, {
 			method: 'GET',
