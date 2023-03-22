@@ -22,7 +22,7 @@ export default function ItemDetail({ item }) {
 		},
 		{
 			label: 'Nome Fantasia',
-			value: empresa.nome_fantasia,
+			value: empresa?.nome_fantasia,
 		},
 		{
 			label: 'Cidade - UF',
