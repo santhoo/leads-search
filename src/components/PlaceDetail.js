@@ -109,7 +109,16 @@ export default function PlaceDetail({ item: rawItem }) {
 			]
 
 			// console.log('parseFindList', queryList)
-			return queryList
+			// remove duplicates (telefone)
+			const queryFiltered = queryList.filter(
+				(obj, index) =>
+					queryList.findIndex(
+						(item) => item.query === obj.query
+					) === index
+			)
+			// console.log('queryFiltered', queryFiltered)
+
+			return queryFiltered
 		}
 	}
 
@@ -126,18 +135,27 @@ export default function PlaceDetail({ item: rawItem }) {
 						const slicedCandidate = candidates.slice(0, 3) // pega detalhes dos 3 primeiros candidatos
 
 						slicedCandidate.map((candidate) => {
-							candidatesList.push({
-								query: item.label,
-								...candidate,
-							})
+							candidate.business_status &&
+								candidatesList.push({
+									query: item.label,
+									...candidate,
+								})
 						})
 					}
 				})
 			)
 
+			const candidatesFiltered = candidatesList.filter(
+				(obj, index) =>
+					candidatesList.findIndex(
+						(item) => item.place_id === obj.place_id
+					) === index
+			) // remove place_id duplicados
+			// console.log('candidatesFiltered', candidatesFiltered)
+
 			// console.log('candidatesList', candidatesList)
-			if (candidatesList.length > 0) {
-				return candidatesList
+			if (candidatesFiltered.length > 0) {
+				return candidatesFiltered
 			}
 		}
 	}
