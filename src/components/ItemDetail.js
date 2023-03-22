@@ -11,10 +11,10 @@ export default function ItemDetail({ item }) {
 		{
 			label: 'Situação Cadastral',
 			value: empresa.situacao_cadastral,
-			bg:
+			textColor:
 				empresa.situacao_cadastral !== 'Ativa'
-					? 'red.100'
-					: 'green.100',
+					? 'red.400'
+					: 'green.400',
 		},
 		{
 			label: 'Razão Social',

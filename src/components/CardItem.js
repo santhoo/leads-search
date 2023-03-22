@@ -40,7 +40,7 @@ export default function CardItem({ item }) {
 				<Heading fontWeight="normal" size="xs">
 					{item.label}
 				</Heading>
-				<Text fontWeight="semibold">
+				<Text fontWeight="semibold" color={item?.textColor}>
 					{item.value?.startsWith('https://') ? (
 						<Link href={item.value} passHref legacyBehavior>
 							<TextLink
@@ -59,7 +59,7 @@ export default function CardItem({ item }) {
 							</TextLink>
 						</Link>
 					) : (
-						item.value
+						item.value || '(vazio)'
 					)}
 				</Text>
 			</Box>
