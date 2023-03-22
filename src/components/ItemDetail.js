@@ -30,7 +30,7 @@ export default function ItemDetail({ item }) {
 		},
 		{
 			label: 'E-mail',
-			value: empresa.email,
+			value: empresa?.email,
 		},
 		{
 			label: 'Telefones',
