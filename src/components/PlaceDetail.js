@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { stringSimilarity } from 'string-similarity-js'
 import {
 	useToast,
 	Heading,
@@ -56,6 +57,7 @@ const labels = {
 	name: 'Nome',
 	url: 'URL no Google Maps',
 	website: 'Site próprio',
+	rank: 'Qualidade',
 }
 
 export default function PlaceDetail({ item: rawItem }) {
@@ -225,7 +227,40 @@ export default function PlaceDetail({ item: rawItem }) {
 			) {
 				console.log('placeDetail', placeId, data)
 
-				return data.result
+				const {
+					razao_social,
+					estabelecimento: { nome_fantasia },
+				} = rawItem
+
+				// Classifica a qualidade do Place
+				let rating = 0
+
+				// Place Name <> Nome CNPJ
+				rating =
+					rating +
+					stringSimilarity(
+						nome_fantasia || razao_social,
+						data.result.name
+					)
+
+				// Place Website <> Nome CNPJ
+				rating =
+					data.result.website &&
+					rating +
+						stringSimilarity(
+							nome_fantasia || razao_social,
+							data.result.website
+						)
+
+				// Se nome não é contabilidade
+				rating =
+					rating -
+					stringSimilarity('contabil', data.result.name)
+
+				return {
+					rank: rating,
+					...data.result,
+				}
 			}
 		} catch (err) {
 			console.log(err)
@@ -252,10 +287,16 @@ export default function PlaceDetail({ item: rawItem }) {
 		async function renderFetch() {
 			setLoading(true)
 			const results = await getPlaces(rawItem)
+			// console.log('useEffect Results:', results)
 
 			setLoading(false)
-			// console.log('useEffect Results:', results)
-			setResultList(results)
+
+			// Ordena pelo Ranking
+			const sortedResults = results.sort((a, b) =>
+				a.place.rank > b.place.rank ? -1 : 1
+			)
+
+			setResultList(sortedResults)
 		}
 
 		rawItem.estabelecimento.situacao_cadastral ===
@@ -343,6 +384,9 @@ export default function PlaceDetail({ item: rawItem }) {
 																		/>
 																	</TextLink>
 																</Link>
+															) : prop[0] === 'rank' ? (
+																prop[1] /
+																resultList[0].place.rank
 															) : (
 																prop[1]
 															)}
