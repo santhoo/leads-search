@@ -243,19 +243,25 @@ export default function PlaceDetail({ item: rawItem }) {
 						data.result.name
 					)
 
+				console.log('RATING: Add nome', rating)
+
 				// Place Website <> Nome CNPJ
-				rating =
-					data.result.website &&
-					rating +
-						stringSimilarity(
+				rating = data.result.website
+					? rating +
+					  stringSimilarity(
 							nome_fantasia || razao_social,
 							data.result.website
-						)
+					  )
+					: rating
+
+				console.log('RATING: Add site', rating)
 
 				// Se nome não é contabilidade
 				rating =
 					rating -
 					stringSimilarity('contabil', data.result.name)
+
+				console.log('RATING: Minus contabil', rating)
 
 				return {
 					rank: rating,
@@ -385,9 +391,10 @@ export default function PlaceDetail({ item: rawItem }) {
 																	</TextLink>
 																</Link>
 															) : prop[0] === 'rank' ? (
-																prop[1] /
-																resultList[0].place.rank
+																prop[1]
 															) : (
+																//  /
+																// resultList[0].place.rank
 																prop[1]
 															)}
 														</Text>
