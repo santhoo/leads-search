@@ -17,38 +17,9 @@ import {
 	Spinner,
 } from '@chakra-ui/react'
 
-import {
-	CopyIcon,
-	ExternalLinkIcon,
-} from '@chakra-ui/icons'
+import { CopyIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 
 import { fetchGet } from '@/util/functions'
-
-// const queryResponse = {
-// 	candidates: [
-// 		{
-// 			place_id: 'ChIJzUjxMJYZqwcRv9jrjyKtTNU',
-// 		},
-// 		{
-// 			place_id: 'ChIJJ3II-64ZqwcRskrRirUCGho',
-// 		},
-// 	],
-// 	status: 'OK',
-// }
-
-// const idResponse = {
-// 	html_attributions: [],
-// 	result: {
-// 		business_status: 'OPERATIONAL',
-// 		formatted_address:
-// 			'R. Benjamin Constant, 2597 - Vila Nova, Blumenau - SC, 89035-100, Brazil',
-// 		formatted_phone_number: '(47) 3309-3700',
-// 		name: 'Cooper Vila Nova Blumenau',
-// 		url: 'https://maps.google.com/?cid=3329914037473559904',
-// 		website: 'https://www.cooper.coop.br/',
-// 	},
-// 	status: 'OK',
-// }
 
 const labels = {
 	formatted_phone_number: 'Telefone',
@@ -64,18 +35,14 @@ export default function PlaceDetail({ item: rawItem }) {
 	const [loading, setLoading] = useState(false)
 
 	function parseFindList(itemObj) {
-		const { razao_social, estabelecimento: empresa } =
-			itemObj
+		const { razao_social, estabelecimento: empresa } = itemObj
 
 		if (Object.keys(empresa)?.length) {
 			let queryList = [
 				{
 					label: `Telefone primário (${
 						empresa.ddd1
-					}) ${empresa.telefone1.replace(
-						/(.{4}$)/,
-						'-$1'
-					)}`,
+					}) ${empresa.telefone1.replace(/(.{4}$)/, '-$1')}`,
 					query: `${empresa.ddd1}${empresa.telefone1}`,
 				},
 				...(empresa.ddd2
@@ -83,10 +50,7 @@ export default function PlaceDetail({ item: rawItem }) {
 							{
 								label: `Telefone secundário (${
 									empresa.ddd2
-								}) ${empresa.telefone2.replace(
-									/(.{4}$)/,
-									'-$1'
-								)}`,
+								}) ${empresa.telefone2.replace(/(.{4}$)/, '-$1')}`,
 								query: `${empresa.ddd2}${empresa.telefone2}`,
 							},
 					  ]
@@ -110,15 +74,11 @@ export default function PlaceDetail({ item: rawItem }) {
 				},
 			]
 
-			// console.log('parseFindList', queryList)
-			// remove duplicates (telefone)
+			// Remove duplicates (telefone)
 			const queryFiltered = queryList.filter(
 				(obj, index) =>
-					queryList.findIndex(
-						(item) => item.query === obj.query
-					) === index
+					queryList.findIndex((item) => item.query === obj.query) === index
 			)
-			// console.log('queryFiltered', queryFiltered)
 
 			return queryFiltered
 		}
@@ -131,10 +91,10 @@ export default function PlaceDetail({ item: rawItem }) {
 			await Promise.all(
 				list.map(async (item) => {
 					const candidates = await findPlaceId(item.query)
-					// console.log(item.query, 'candidates', candidates)
 
 					if (candidates?.length > 0) {
-						const slicedCandidate = candidates.slice(0, 3) // pega detalhes dos 3 primeiros candidatos
+						// Get first 3
+						const slicedCandidate = candidates.slice(0, 3)
 
 						slicedCandidate.map((candidate) => {
 							candidate.business_status &&
@@ -147,15 +107,13 @@ export default function PlaceDetail({ item: rawItem }) {
 				})
 			)
 
+			// Remove place_id duplicados
 			const candidatesFiltered = candidatesList.filter(
 				(obj, index) =>
-					candidatesList.findIndex(
-						(item) => item.place_id === obj.place_id
-					) === index
-			) // remove place_id duplicados
-			// console.log('candidatesFiltered', candidatesFiltered)
+					candidatesList.findIndex((item) => item.place_id === obj.place_id) ===
+					index
+			)
 
-			// console.log('candidatesList', candidatesList)
 			if (candidatesFiltered.length > 0) {
 				return candidatesFiltered
 			}
@@ -167,7 +125,6 @@ export default function PlaceDetail({ item: rawItem }) {
 
 		if (list.length > 0) {
 			const placesId = await parseCandidates(list)
-			// console.log('placesId', placesId)
 
 			if (placesId?.length > 0) {
 				let placesList = []
@@ -185,7 +142,6 @@ export default function PlaceDetail({ item: rawItem }) {
 					})
 				)
 
-				// console.log('placesList', placesList)
 				if (placesList?.length > 0) {
 					return placesList
 				}
@@ -195,73 +151,42 @@ export default function PlaceDetail({ item: rawItem }) {
 
 	async function findPlaceId(query) {
 		try {
-			const { data } = await fetchGet(
-				'placeId',
-				encodeURI(query)
-			)
+			const { data } = await fetchGet('placeId', encodeURI(query))
 
-			if (
-				data.status === 'OK' &&
-				data.candidates?.length > 0
-			) {
-				console.log('findPlaceId', query, data)
-
+			if (data.status === 'OK' && data.candidates?.length > 0) {
 				return data.candidates
 			}
 		} catch (err) {
-			console.log(err)
+			console.error(err)
 		}
 	}
 
 	async function placeDetail(placeId) {
 		try {
-			const { data } = await fetchGet(
-				'placeDetails',
-				placeId
-			)
+			const { data } = await fetchGet('placeDetails', placeId)
 
-			// console.log('DATA', data)
-			if (
-				data.status === 'OK' &&
-				Object.keys(data?.result).length > 0
-			) {
-				console.log('placeDetail', placeId, data)
-
+			if (data.status === 'OK' && Object.keys(data?.result).length > 0) {
 				const {
 					razao_social,
 					estabelecimento: { nome_fantasia },
 				} = rawItem
 
-				// Classifica a qualidade do Place
+				// Rank Place quality
 				let rating = 0
 
 				// Place Name <> Nome CNPJ
 				rating =
 					rating +
-					stringSimilarity(
-						nome_fantasia || razao_social,
-						data.result.name
-					)
-
-				console.log('RATING: Add nome', rating)
+					stringSimilarity(nome_fantasia || razao_social, data.result.name)
 
 				// Place Website <> Nome CNPJ
 				rating = data.result.website
 					? rating +
-					  stringSimilarity(
-							nome_fantasia || razao_social,
-							data.result.website
-					  )
+					  stringSimilarity(nome_fantasia || razao_social, data.result.website)
 					: rating
 
-				console.log('RATING: Add site', rating)
-
-				// Se nome não é contabilidade
-				rating =
-					rating -
-					stringSimilarity('contabil', data.result.name)
-
-				console.log('RATING: Minus contabil', rating)
+				// If name is 'contabilidade'
+				rating = rating - stringSimilarity('contabil', data.result.name)
 
 				return {
 					rank: rating,
@@ -269,7 +194,7 @@ export default function PlaceDetail({ item: rawItem }) {
 				}
 			}
 		} catch (err) {
-			console.log(err)
+			console.error(err)
 		}
 	}
 
@@ -285,7 +210,6 @@ export default function PlaceDetail({ item: rawItem }) {
 	}
 
 	const [resultList, setResultList] = useState([])
-	// const placesList = getPlaces(rawItem)
 
 	useEffect(() => {
 		setResultList([])
@@ -293,11 +217,11 @@ export default function PlaceDetail({ item: rawItem }) {
 		async function renderFetch() {
 			setLoading(true)
 			const results = await getPlaces(rawItem)
-			// console.log('useEffect Results:', results)
 
 			setLoading(false)
 
-			// Ordena pelo Ranking
+			if (!results?.length > 0) return
+
 			const sortedResults = results.sort((a, b) =>
 				a.place.rank > b.place.rank ? -1 : 1
 			)
@@ -305,8 +229,7 @@ export default function PlaceDetail({ item: rawItem }) {
 			setResultList(sortedResults)
 		}
 
-		rawItem.estabelecimento.situacao_cadastral ===
-			'Ativa' && renderFetch()
+		rawItem.estabelecimento.situacao_cadastral === 'Ativa' && renderFetch()
 	}, [rawItem])
 
 	return (
@@ -351,68 +274,40 @@ export default function PlaceDetail({ item: rawItem }) {
 						</Badge>
 						<CardBody p="2">
 							{Object.keys(place)?.length > 0 && (
-								<Stack
-									divider={<StackDivider />}
-									spacing="3"
-								>
-									{Object.entries(place).map(
-										(prop, index) => (
-											<Box key={index}>
-												<Flex alignItems="center">
-													<Box flex="1">
-														<Heading
-															fontWeight="normal"
-															size="xs"
-														>
-															{labels[prop[0]] || prop[0]}
-														</Heading>
-														<Text
-															noOfLines={1}
-															fontWeight="semibold"
-														>
-															{prop[0] === 'url' ||
-															prop[0] === 'website' ? (
-																<Link
-																	href={prop[1]}
-																	passHref
-																	legacyBehavior
-																>
-																	<TextLink
-																		color="blue.500"
-																		isExternal
-																	>
-																		{prop[1]}{' '}
-																		<ExternalLinkIcon
-																			mb="1"
-																			ml="1"
-																			w="4"
-																			h="4"
-																		/>
-																	</TextLink>
-																</Link>
-															) : prop[0] === 'rank' ? (
-																prop[1]
-															) : (
-																//  /
-																// resultList[0].place.rank
-																prop[1]
-															)}
-														</Text>
-													</Box>
-													<IconButton
-														colorScheme="blue"
-														_hover={{ bg: 'blue.100' }}
-														variant="ghost"
-														ml="2"
-														icon={<CopyIcon />}
-														onClick={() =>
-															clickCopy(prop[1], prop[0])
-														}
-													/>
-												</Flex>
-											</Box>
-										)
-									)}
+								<Stack divider={<StackDivider />} spacing="3">
+									{Object.entries(place).map((prop, index) => (
+										<Box key={index}>
+											<Flex alignItems="center">
+												<Box flex="1">
+													<Heading fontWeight="normal" size="xs">
+														{labels[prop[0]] || prop[0]}
+													</Heading>
+													<Text noOfLines={1} fontWeight="semibold">
+														{prop[0] === 'url' || prop[0] === 'website' ? (
+															<Link href={prop[1]} passHref legacyBehavior>
+																<TextLink color="blue.500" isExternal>
+																	{prop[1]}{' '}
+																	<ExternalLinkIcon mb="1" ml="1" w="4" h="4" />
+																</TextLink>
+															</Link>
+														) : prop[0] === 'rank' ? (
+															prop[1]
+														) : (
+															prop[1]
+														)}
+													</Text>
+												</Box>
+												<IconButton
+													colorScheme="blue"
+													_hover={{ bg: 'blue.100' }}
+													variant="ghost"
+													ml="2"
+													icon={<CopyIcon />}
+													onClick={() => clickCopy(prop[1], prop[0])}
+												/>
+											</Flex>
+										</Box>
+									))}
 								</Stack>
 							)}
 						</CardBody>
@@ -421,17 +316,9 @@ export default function PlaceDetail({ item: rawItem }) {
 			) : (
 				<>
 					{loading ? (
-						<Spinner
-							color="yellow.600"
-							thickness="3px"
-							mx="auto"
-						/>
+						<Spinner color="yellow.600" thickness="3px" mx="auto" />
 					) : (
-						<Heading
-							color="gray.400"
-							size="sm"
-							textAlign="center"
-						>
+						<Heading color="gray.400" size="sm" textAlign="center">
 							Nenhuma informação encontrada
 						</Heading>
 					)}

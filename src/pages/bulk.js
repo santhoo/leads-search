@@ -36,12 +36,12 @@ export default function Bulk() {
 
 	const [searchList, setSearchList] = useState([])
 	function parseSearch(list) {
-		// Monta Array com linhas da Textarea
+		// Init Array with textarea lines
 		const valid = list.filter(function (entry) {
 			const sanit = entry.trim().replace(/[^0-9]/g, '')
 			if (
-				sanit !== '' && // Limpa linhas vazias
-				sanit.length === 14 // Aceita apenas CNPJs
+				sanit !== '' && // Exclude empty lines
+				sanit.length === 14 // Only accept CNPJs
 			) {
 				return true
 			}
@@ -64,21 +64,15 @@ export default function Bulk() {
 			searchList.forEach((cnpj, i) => {
 				setSearchTimeout(
 					setTimeout(async () => {
-						const cnpjSanit = cnpj
-							.trim()
-							.replace(/[^0-9]/g, '')
+						const cnpjSanit = cnpj.trim().replace(/[^0-9]/g, '')
 						const response = await fetchCnpj(cnpjSanit)
 
 						const timeNow = Date.now()
 						setLastSearchTime(timeNow)
 
-						setResultList((resultList) => [
-							...resultList,
-							response,
-						])
-						// console.log('RESPONSE:', cnpj, response)
+						setResultList((resultList) => [...resultList, response])
 
-						// Cria log de cada consulta
+						// Log search time
 						let today = new Date()
 						console.log(
 							'Buscando:',
@@ -90,10 +84,10 @@ export default function Bulk() {
 								today.getSeconds()
 						)
 
-						// Define o primeiro resultado como ativo
+						// Set first result as active
 						i === 0 && handleOpen.setActive(response)
 
-						// Para o Loading se for o último fetch
+						// Stop loading for last fetch
 						i + 1 === searchList.length && setLoading(false)
 					}, i * serchInterval)
 				)
@@ -103,15 +97,12 @@ export default function Bulk() {
 
 	async function fetchCnpj(cnpj) {
 		try {
-			const response = await fetch(
-				`https://publica.cnpj.ws/cnpj/${cnpj}`,
-				{
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-			)
+			const response = await fetch(`https://publica.cnpj.ws/cnpj/${cnpj}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
 
 			if (response.status === 200) {
 				return await response.json()
@@ -122,7 +113,6 @@ export default function Bulk() {
 				}
 			}
 		} catch (err) {
-			// throw new Error(err)
 			return {
 				cnpj: cnpj,
 				error: 'Erro ao buscar CNPJ',
@@ -134,7 +124,7 @@ export default function Bulk() {
 
 	const [newSearch, setNewSearch] = useState(false)
 	function HandleNewSearch() {
-		// Para a busca que está acontecendo
+		// Stop current search
 		clearTimeout(searchTimeout)
 		setLoading(false)
 		setNewSearch(true)
@@ -147,23 +137,14 @@ export default function Bulk() {
 			</Head>
 
 			<Flex direction="row" w="100%" h="100vh" maxH="100vh">
-				<Flex
-					bg="gray.200"
-					flex="0 0 40%"
-					w="40%"
-					p="8"
-					direction="column"
-				>
-					{(resultList.length === 0 ||
-						newSearch !== false) && (
+				<Flex bg="gray.200" flex="0 0 40%" w="40%" p="8" direction="column">
+					{(resultList.length === 0 || newSearch !== false) && (
 						<>
 							<Heading fontSize="2xl" mb="2">
 								Busca em massa de Leads
 							</Heading>
 							<FormControl as={Flex} direction="column">
-								<FormLabel>
-									Digite um CNPJ por linha
-								</FormLabel>
+								<FormLabel>Digite um CNPJ por linha</FormLabel>
 								<Textarea
 									bg="white"
 									value={textareaValue}
@@ -172,9 +153,7 @@ export default function Bulk() {
 									rows="5"
 									placeholder={`__.___.___/____-__\n__.___.___/____-__\n__.___.___/____-__`}
 									isDisabled={loading}
-									onChange={(e) =>
-										handleTextList(e.target.value)
-									}
+									onChange={(e) => handleTextList(e.target.value)}
 								/>
 								<FormHelperText
 									as={Flex}
@@ -187,16 +166,11 @@ export default function Bulk() {
 										label={`${
 											textList.length - searchList.length
 										} linhas não são CNPJ válidos`}
-										isDisabled={
-											textList.length === searchList.length
-										}
+										isDisabled={textList.length === searchList.length}
 									>
 										<Text
 											ml="1"
-											color={
-												textList.length !==
-													searchList.length && 'red.500'
-											}
+											color={textList.length !== searchList.length && 'red.500'}
 										>
 											CNPJs: {searchList.length}
 										</Text>
@@ -219,12 +193,7 @@ export default function Bulk() {
 					{newSearch === false && resultList.length > 0 && (
 						<Flex direction="row">
 							{loading && (
-								<Button
-									size="sm"
-									mr="4"
-									variant="ghost"
-									isLoading={loading}
-								>
+								<Button size="sm" mr="4" variant="ghost" isLoading={loading}>
 									Loading
 								</Button>
 							)}
@@ -247,12 +216,7 @@ export default function Bulk() {
 					/>
 				</Flex>
 
-				<Box
-					bg="gray.50"
-					flex="1"
-					h="100%"
-					position="relative"
-				>
+				<Box bg="gray.50" flex="1" h="100%" position="relative">
 					<Flex
 						position="absolute"
 						left="0"
@@ -271,11 +235,7 @@ export default function Bulk() {
 								textAlign="center"
 								direction="column"
 							>
-								<Search2Icon
-									boxSize={12}
-									mb="6"
-									color="gray.300"
-								/>
+								<Search2Icon boxSize={12} mb="6" color="gray.300" />
 								<Heading size="md" color="gray.400">
 									{handleOpen.active.empty}
 								</Heading>

@@ -26,24 +26,20 @@ export default function Home() {
 		setCurrent(null)
 		setLoading(true)
 		try {
-			const res = await fetch(
-				`https://publica.cnpj.ws/cnpj/${cnpjSanit}`,
-				{
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-			)
+			const res = await fetch(`https://publica.cnpj.ws/cnpj/${cnpjSanit}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
 
 			if (res.status === 200) {
 				const data = await res.json()
 				setCurrent(data)
 				setLoading(false)
-				console.log('CURRENT', current)
 			}
 		} catch (err) {
-			console.log(err)
+			console.error(err)
 			setLoading(false)
 		}
 	}

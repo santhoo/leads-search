@@ -1,1 +1,1 @@
-export const serchInterval = 40000 // 40 segundos
+export const serchInterval = 40000 // 40 seconds

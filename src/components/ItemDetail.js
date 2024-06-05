@@ -4,17 +4,16 @@ import CardItem from '@/components/CardItem'
 import PlaceDetail from '@/components/PlaceDetail'
 
 export default function ItemDetail({ item }) {
-	// console.log('ITEM:', item)
 	const { razao_social, estabelecimento: empresa } = item
+
+	if (!razao_social || !empresa) return
 
 	const parse = [
 		{
 			label: 'Situação Cadastral',
 			value: empresa.situacao_cadastral,
 			textColor:
-				empresa.situacao_cadastral !== 'Ativa'
-					? 'red.400'
-					: 'green.400',
+				empresa.situacao_cadastral !== 'Ativa' ? 'red.400' : 'green.400',
 		},
 		{
 			label: 'Razão Social',
@@ -39,9 +38,7 @@ export default function ItemDetail({ item }) {
 				'-$1'
 			)} ${
 				empresa.ddd2 !== null
-					? ` / (${
-							empresa.ddd2
-					  }) ${empresa.telefone2.replace(
+					? ` / (${empresa.ddd2}) ${empresa.telefone2.replace(
 							/(.{4}$)/,
 							'-$1'
 					  )}`
@@ -67,23 +64,17 @@ export default function ItemDetail({ item }) {
 		'uol.com.br',
 	]
 
-	const sanitDomain = [
-		'assessoria',
-		'contabilidade',
-		'contabil',
-	]
+	const sanitDomain = ['assessoria', 'contabilidade', 'contabil']
 
 	const emailDomain = empresa.email.split('@')[1]
 
 	if (!invalidDomains.includes(emailDomain)) {
-		// Se domínio de e-mail não for genérico
+		// Check if email domain is generic
 
 		// const emailTeste = 'endereco@dominio.com'
 		// if (!invalidDomains.includes(emailTeste.split('@')[1])) {
 
-		const domainAlert = sanitDomain.some((w) =>
-			emailDomain.includes(w)
-		)
+		const domainAlert = sanitDomain.some((w) => emailDomain.includes(w))
 
 		parse.push({
 			label: 'Possível site',

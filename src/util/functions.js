@@ -24,19 +24,16 @@ async function fetchGet(endpoint, query) {
 	const url = process.env.NEXT_PUBLIC_API
 
 	try {
-		const response = await fetch(
-			`${url}/${endpoint}/${query}`,
-			{
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}
-		)
+		const response = await fetch(`${url}/${endpoint}/${query}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
 
 		return await response.json()
 	} catch (err) {
-		console.log(err)
+		console.error(err)
 	}
 }
 
